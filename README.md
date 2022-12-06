@@ -9,7 +9,7 @@ This is a BLE peripheral example app built with [Embassy](https://github.com/emb
 	* Button service: Button state notification
 	* UART service: BLE <-> UART interface
 * Concurrent connections
-* Messaging across threads
+* Messaging between async tasks
 
 ## Requirements
 
