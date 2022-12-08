@@ -15,7 +15,7 @@ harness = false
 
 [features]
 default = ["microbit-v2"]
-nrf52dk = ["embassy-nrf/nrf52832", "nrf-softdevice/nrf52832", "nrf-softdevice/s132"]
+nrf52dk = ["embassy-nrf/nrf52832", "nrf-softdevice/nrf52832", "nrf-softdevice/s132", "embassy-time/tick-hz-32_768"]
 microbit-v2 = ["embassy-nrf/nrf52833", "nrf-softdevice/nrf52833", "nrf-softdevice/s140", "embassy-time/tick-hz-32_768"]
 nrf52840dk = ["embassy-nrf/nrf52840", "nrf-softdevice/nrf52840", "nrf-softdevice/s140", "embassy-time/tick-hz-32_768"]
 
