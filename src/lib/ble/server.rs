@@ -10,21 +10,33 @@ use futures::{
 };
 use nrf_softdevice::{
     ble::{gatt_server, peripheral, Connection},
+    raw::{
+        BLE_GAP_ADV_FLAGS_LE_ONLY_GENERAL_DISC_MODE, BLE_GAP_AD_TYPE_128BIT_SERVICE_UUID_COMPLETE,
+        BLE_GAP_AD_TYPE_COMPLETE_LOCAL_NAME, BLE_GAP_AD_TYPE_FLAGS,
+    },
     Softdevice,
 };
 use static_cell::StaticCell;
 
 /// BLE advertising data
 #[rustfmt::skip]
-const ADV_DATA: &[u8; 18] =
+const ADV_DATA: &[u8; 14] =
     &[
-        0x02, 0x01, nrf_softdevice::raw::BLE_GAP_ADV_FLAGS_LE_ONLY_GENERAL_DISC_MODE as u8,
-        0x03, 0x03, 0x09, 0x18,
-        0x0a, 0x09, b'H', b'e', b'l', b'l', b'o', b'R', b'u', b's', b't'
+        0x02, BLE_GAP_AD_TYPE_FLAGS as u8, BLE_GAP_ADV_FLAGS_LE_ONLY_GENERAL_DISC_MODE as u8,
+        0x0a, BLE_GAP_AD_TYPE_COMPLETE_LOCAL_NAME as u8, b'H', b'e', b'l', b'l', b'o', b'R', b'u', b's', b't'
     ];
 
-/// BLE scan data
-const SCAN_DATA: &[u8; 4] = &[0x03, 0x03, 0x09, 0x18];
+/// BLE scan response data
+#[rustfmt::skip]
+const SCAN_RESPONSE_DATA: &[u8; 18] = &[
+    // AD length
+    0x11, 
+    // AD type
+    BLE_GAP_AD_TYPE_128BIT_SERVICE_UUID_COMPLETE as u8,
+    // AD data
+    // UART service UUID: 9e7312e1-2354-11eb-9f10-fbc30a62cf38. This has to be sent in little endian order.
+    0x38, 0xcf, 0x62, 0x0a, 0xc3, 0xfb, 0x10, 0x9f, 0xeb, 0x11, 0x54, 0x23, 0xe1, 0x12, 0x73, 0x9E,
+];
 
 /// BLE GATT server
 #[nrf_softdevice::gatt_server]
@@ -48,7 +60,7 @@ pub async fn ble_server_task(spawner: Spawner, server: Server, sd: &'static Soft
     let config = peripheral::Config::default();
     let adv = peripheral::ConnectableAdvertisement::ScannableUndirected {
         adv_data: ADV_DATA,
-        scan_data: SCAN_DATA,
+        scan_data: SCAN_RESPONSE_DATA,
     };
 
     loop {
