@@ -14,26 +14,53 @@ name = "integration"
 harness = false
 
 [features]
-default = ["microbit-v2"]
-nrf52dk = ["embassy-nrf/nrf52832", "nrf-softdevice/nrf52832", "nrf-softdevice/s132"]
-microbit-v2 = ["embassy-nrf/nrf52833", "nrf-softdevice/nrf52833", "nrf-softdevice/s140"]
-nrf52840dk = ["embassy-nrf/nrf52840", "nrf-softdevice/nrf52840", "nrf-softdevice/s140"]
+default = ["nrf52840dk"]
+nrf52dk = [
+    "embassy-nrf/nrf52832",
+    "nrf-softdevice/nrf52832",
+    "nrf-softdevice/s132",
+]
+microbit-v2 = [
+    "embassy-nrf/nrf52833",
+    "nrf-softdevice/nrf52833",
+    "nrf-softdevice/s140",
+]
+nrf52840dk = [
+    "embassy-nrf/nrf52840",
+    "nrf-softdevice/nrf52840",
+    "nrf-softdevice/s140",
+]
 
 [dependencies]
-cortex-m = "0.7.2"
-cortex-m-rt = "0.7"
-defmt = "0.3"
-defmt-rtt = "0.4"
-panic-probe = { version = "0.3", features = ["print-defmt"] }
-embassy-executor = { version = "*", features = ["nightly", "defmt", "integrated-timers"] }
-embassy-time = { version = "*", features = ["nightly", "defmt", "defmt-timestamp-uptime"] }
-embassy-sync = { version = "*", features = ["nightly", "defmt"] }
+embassy-executor = { version = "*", features = [
+    "arch-cortex-m",
+    "executor-thread",
+    "executor-interrupt",
+    "defmt",
+    "integrated-timers",
+] }
+embassy-time = { version = "*", features = ["defmt", "defmt-timestamp-uptime"] }
+embassy-sync = { version = "*" }
+embassy-nrf = { version = "*", features = [
+    "defmt",
+    "gpiote",
+    "time-driver-rtc1",
+] }
 embassy-futures = { version = "*" }
-embassy-nrf = { version = "*", features = ["nightly", "time-driver-rtc1", "defmt", "gpiote", "unstable-traits"] }
-nrf-softdevice = { git = "https://github.com/embassy-rs/nrf-softdevice", features = ["defmt", "ble-gatt-server", "ble-peripheral", "critical-section-impl"] }
-futures = { version = "0.3.5", default-features = false }
-heapless = { version = "0.7.16", features = ["defmt-impl"] }
-static_cell = "1.0.0"
+nrf-softdevice = { git = "https://github.com/embassy-rs/nrf-softdevice", features = [
+    "defmt",
+    "ble-peripheral",
+    "ble-gatt-server",
+    "critical-section-impl",
+] }
+cortex-m = "0.7.7"
+cortex-m-rt = "0.7.3"
+defmt = "0.3.5"
+defmt-rtt = "0.4.0"
+panic-probe = { version = "0.3.1", features = ["print-defmt"] }
+futures = { version = "0.3.29", default-features = false }
+heapless = { version = "0.8", features = ["defmt-03"] }
+static_cell = "2.0.0"
 
 [dev-dependencies]
 defmt-test = "0.3"
@@ -77,8 +104,8 @@ opt-level = 3            # <-
 overflow-checks = false  # <-
 
 [patch.crates-io]
-embassy-executor = { git = "https://github.com/embassy-rs/embassy", rev = "ebc735008f0b1725b22c944cc5f95fe1aacc665b" }
-embassy-nrf = { git = "https://github.com/embassy-rs/embassy", rev = "ebc735008f0b1725b22c944cc5f95fe1aacc665b" }
-embassy-time = { git = "https://github.com/embassy-rs/embassy", rev = "ebc735008f0b1725b22c944cc5f95fe1aacc665b" }
-embassy-sync = { git = "https://github.com/embassy-rs/embassy", rev = "ebc735008f0b1725b22c944cc5f95fe1aacc665b" }
-embassy-futures = { git = "https://github.com/embassy-rs/embassy", rev = "ebc735008f0b1725b22c944cc5f95fe1aacc665b" }
+embassy-nrf = { git = "https://github.com/embassy-rs/embassy", rev = "85d5f42562ca9374e3200d652616af9533346c5e" }
+embassy-executor = { git = "https://github.com/embassy-rs/embassy", rev = "85d5f42562ca9374e3200d652616af9533346c5e" }
+embassy-macros = { git = "https://github.com/embassy-rs/embassy", rev = "85d5f42562ca9374e3200d652616af9533346c5e" }
+embassy-sync = { git = "https://github.com/embassy-rs/embassy", rev = "85d5f42562ca9374e3200d652616af9533346c5e" }
+embassy-time = { git = "https://github.com/embassy-rs/embassy", rev = "85d5f42562ca9374e3200d652616af9533346c5e" }
