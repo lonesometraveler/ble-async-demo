@@ -63,6 +63,7 @@ dependencies = [
  "defmt",
  "defmt-rtt",
  "defmt-test",
+ "embassy",
  "embassy-executor",
  "embassy-futures 0.1.1 (registry+https://github.com/rust-lang/crates.io-index)",
  "embassy-nrf",
@@ -280,6 +281,12 @@ dependencies = [
  "quote",
  "syn 1.0.109",
 ]
+
+[[package]]
+name = "embassy"
+version = "0.0.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "902e14c8b21b6f56f8d21a1c5de34aa3423acc61b136e47ec591d0758c3e77be"
 
 [[package]]
 name = "embassy-embedded-hal"
