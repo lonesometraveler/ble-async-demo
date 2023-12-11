@@ -107,9 +107,7 @@ async fn conn_task(
             info!("Notification service encountered an error and stopped!")
         }
         Either::Right((res, _)) => {
-            if let Err(e) = res {
-                info!("gatt_server run exited with error: {:?}", e);
-            }
+            info!("gatt_server run exited with error: {:?}", res);
         }
     };
 }
@@ -123,12 +121,12 @@ async fn subscriber_task<'a>(
     loop {
         match subscriber.next_message_pure().await {
             AppEvent::UartRxWritten(bytes) => {
-                if let Err(e) = server.uart.bytes_notify(conn, bytes) {
+                if let Err(e) = server.uart.bytes_notify(conn, &bytes) {
                     error!("{:?}", e);
                 }
             }
             AppEvent::Button(state) => {
-                if let Err(e) = server.button.state_notify(conn, state.into()) {
+                if let Err(e) = server.button.state_notify(conn, &state.into()) {
                     error!("{:?}", e);
                 }
             }

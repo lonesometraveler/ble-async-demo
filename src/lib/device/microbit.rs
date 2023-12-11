@@ -1,11 +1,17 @@
 //! Board definition for Microbit v2
 use embassy_nrf::{
+    bind_interrupts,
     gpio::{AnyPin, Input, Level, Output, OutputDrive, Pin, Pull},
     interrupt::{self, InterruptExt, Priority},
     peripherals::{TWISPI0, UARTE0},
-    twim::Twim,
+    twim::{self, Twim},
     uarte::{self, Uarte},
 };
+
+bind_interrupts!(struct Irqs {
+    UARTE0_UART0 => uarte::InterruptHandler<UARTE0>;
+    SPIM0_SPIS0_TWIM0_TWIS0_SPI0_TWI0 => twim::InterruptHandler<TWISPI0>;
+});
 
 pub struct Board {
     /// Onboard LED Column 1
@@ -45,17 +51,15 @@ impl Board {
 
         // configure twi
         let twim_config = embassy_nrf::twim::Config::default();
-        let twim_irq = interrupt::take!(SPIM0_SPIS0_TWIM0_TWIS0_SPI0_TWI0);
-        twim_irq.set_priority(Priority::P3);
-        let twim = Twim::new(p.TWISPI0, twim_irq, p.P0_16, p.P0_08, twim_config);
+        interrupt::SPIM0_SPIS0_TWIM0_TWIS0_SPI0_TWI0.set_priority(Priority::P3);
+        let twim = Twim::new(p.TWISPI0, Irqs, p.P0_16, p.P0_08, twim_config);
 
         // configure uart
         let mut uart_config = uarte::Config::default();
         uart_config.parity = uarte::Parity::EXCLUDED;
         uart_config.baudrate = uarte::Baudrate::BAUD115200;
-        let uart_irq = interrupt::take!(UARTE0_UART0);
-        uart_irq.set_priority(Priority::P3);
-        let uart = uarte::Uarte::new(p.UARTE0, uart_irq, p.P1_08, p.P0_06, uart_config);
+        interrupt::UARTE0_UART0.set_priority(Priority::P3);
+        let uart = uarte::Uarte::new(p.UARTE0, Irqs, p.P1_08, p.P0_06, uart_config);
 
         Board {
             led1,
