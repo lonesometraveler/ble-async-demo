@@ -5,15 +5,13 @@
 use ble_async_demo::{
     self as _,
     ble::{sd, server},
-    button_handler,
     device::Board,
-    led_handler,
-    message::{self, AppEvent, PinState},
-    uart_rx_handler,
 };
 use defmt::*;
 use embassy_executor::Spawner;
 use embassy_nrf::interrupt::Priority;
+use embassy_time::{Duration, Timer};
+use ens160::{AirQualityIndex, Ens160};
 
 #[embassy_executor::main]
 async fn main(spawner: Spawner) {
@@ -28,17 +26,6 @@ async fn main(spawner: Spawner) {
     // Initialize board with peripherals
     let board = Board::init(p);
 
-    // Run LED indicator task
-    unwrap!(spawner.spawn(led_handler::run(board.led3)));
-
-    // BLE controllable LED
-    let mut ble_led = board.led4;
-
-    // Messaging: Create Publishers and Subscribers
-    let mut subscriber = unwrap!(message::MESSAGE_BUS.subscriber());
-    let publisher_1 = unwrap!(message::MESSAGE_BUS.publisher());
-    let publisher_2 = unwrap!(message::MESSAGE_BUS.publisher());
-
     // Enable SoftDevice
     let sd = nrf_softdevice::Softdevice::enable(&sd::softdevice_config());
 
@@ -51,29 +38,28 @@ async fn main(spawner: Spawner) {
     // Run BLE server task
     unwrap!(spawner.spawn(server::ble_server_task(spawner, server, sd)));
 
-    // Run Button task
-    unwrap!(spawner.spawn(button_handler::run(board.button1, publisher_1)));
+    let twim = board.twim;
+    // Set up TWI slave
+    let mut device = Ens160::new(twim, 0x53);
 
-    // UART device: split to tx and rx
-    let (mut tx, rx) = board.uart.split();
-
-    // Run UART RX task
-    unwrap!(spawner.spawn(uart_rx_handler::run(rx, publisher_2)));
-
-    // Wait for a message...
     loop {
-        match subscriber.next_message_pure().await {
-            AppEvent::Led(pin_state) => match pin_state {
-                PinState::High => ble_led.set_high(),
-                PinState::Low => ble_led.set_low(),
-            },
-            AppEvent::BleBytesWritten(data) => {
-                // Send the received data through UART TX
-                if let Err(e) = tx.write(&data).await {
-                    error!("{:?}", e);
+        if let Ok(status) = device.status() {
+            if status.data_is_ready() {
+                let tvoc = device.tvoc().unwrap();
+                info!("TVOC: {}", tvoc);
+
+                let eco2 = device.eco2().unwrap();
+                let air_quality_index = AirQualityIndex::try_from(eco2).unwrap();
+                match air_quality_index {
+                    AirQualityIndex::Excellent => info!("Air quality index: Excellent"),
+                    AirQualityIndex::Good => info!("Air quality index: Good"),
+                    AirQualityIndex::Moderate => info!("Air quality index: Moderate"),
+                    AirQualityIndex::Poor => info!("Air quality index: Poor"),
+                    AirQualityIndex::Unhealthy => info!("Air quality index: Unhealthy"),
                 }
             }
-            _ => (),
         }
+
+        Timer::after(Duration::from_millis(1_000)).await;
     }
 }
