@@ -53,28 +53,28 @@ SoftDevice needs to be flashed first. You only need to do this once. (If you do 
 
 #### 1.1 Erase the chip
 
-* nRF52DK: `probe-rs-cli erase --chip nRF52832_xxAA`
+* nRF52DK: `probe-rs erase --chip nRF52832_xxAA`
 
-* micro:bit v2: `probe-rs-cli erase --chip nRF52833_xxAA`
+* micro:bit v2: `probe-rs erase --chip nRF52833_xxAA`
 
-* nRF52840DK: `probe-rs-cli erase --chip nRF52840_xxAA`
+* nRF52840DK: `probe-rs erase --chip nRF52840_xxAA`
 
 #### 1.2 Flash softdevice
 
-* nRF52DK: `probe-rs-cli download --chip nRF52832_xxAA --format hex s132_nrf52_7.3.0_softdevice.hex`
+* nRF52DK: `probe-rs download --chip nRF52832_xxAA --format hex s132_nrf52_7.3.0_softdevice.hex`
 
-* micro:bit v2: `probe-rs-cli download --chip nRF52833_xxAA --format hex s140_nrf52_7.3.0_softdevice.hex`
+* micro:bit v2: `probe-rs download --chip nRF52833_xxAA --format hex s140_nrf52_7.3.0_softdevice.hex`
 
-* nRF52840DK: `probe-rs-cli download --chip nRF52840_xxAA --format hex s140_nrf52_7.3.0_softdevice.hex`
+* nRF52840DK: `probe-rs download --chip nRF52840_xxAA --format hex s140_nrf52_7.3.0_softdevice.hex`
 
 ### 2. Select a runner
 
 Choose a runner for your board in `.cargo/config.toml`
 
 ```
-# runner = "probe-run --chip nRF52832_xxAA"
-# runner = "probe-run --chip nRF52833_xxAA"
-runner = "probe-run --chip nRF52840_xxAA"
+# runner = "probe-rs run --chip nRF52832_xxAA"
+# runner = "probe-rs run --chip nRF52833_xxAA"
+runner = "probe-rs run --chip nRF52840_xxAA"
 ```
 
 ### 3. Select a feature
